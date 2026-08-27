@@ -988,18 +988,24 @@ const STATIC_DIR = process.env.STATIC_DIR ? path.resolve(process.env.STATIC_DIR)
 function serveStatic(req, res, pathname) {
   if (!STATIC_DIR || !fs.existsSync(STATIC_DIR)) return false;
   let target = path.join(STATIC_DIR, path.normalize(pathname).replace(/^(\.\.[\/\\])+/, ''));
+  const ext = path.extname(target).toLowerCase();
+
   if (fs.existsSync(target) && fs.statSync(target).isDirectory()) {
     target = path.join(target, 'index.html');
   }
+
+  // SPA fallback for HTML routes (paths without asset extensions)
   if (!fs.existsSync(target) || fs.statSync(target).isDirectory()) {
+    if (ext && ext !== '.html') return false;
     target = path.join(STATIC_DIR, 'index.html');
   }
+
   if (!fs.existsSync(target)) return false;
-  const ext = path.extname(target).toLowerCase();
-  const contentType = MIME_TYPES[ext] || 'application/octet-stream';
+  const fileExt = path.extname(target).toLowerCase();
+  const contentType = MIME_TYPES[fileExt] || 'application/octet-stream';
   res.writeHead(200, {
     'Content-Type': contentType,
-    'Cache-Control': ext === '.html' ? 'no-cache, must-revalidate' : 'public, max-age=2592000, immutable',
+    'Cache-Control': fileExt === '.html' ? 'no-cache, must-revalidate' : 'public, max-age=2592000, immutable',
     'X-Frame-Options': 'DENY',
     'X-Content-Type-Options': 'nosniff'
   });
