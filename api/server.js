@@ -16,9 +16,25 @@ import { verifyError } from './verify-error.js';
 
 const PORT = +(process.env.PORT || 3000);
 const DATA = process.env.DATA_DIR || '/data';
-const RP_ID = process.env.RP_ID || 'localhost';
-const ORIGIN = process.env.ORIGIN || 'http://localhost:8080';
+const RP_ID = process.env.RP_ID || '';
+const ORIGIN = process.env.ORIGIN || '';
 const RP_NAME = process.env.RP_NAME || 'openGym';
+
+function getRpId(req) {
+  if (process.env.RP_ID && process.env.RP_ID !== 'localhost' && process.env.RP_ID !== '') return process.env.RP_ID;
+  const rawHost = req.headers['x-forwarded-host'] || req.headers.host || '';
+  const host = rawHost.split(':')[0].trim();
+  return host || 'localhost';
+}
+
+function getOrigin(req) {
+  if (process.env.ORIGIN && process.env.ORIGIN !== 'http://localhost:8080' && process.env.ORIGIN !== '') return process.env.ORIGIN;
+  const rawOrigin = req.headers.origin;
+  if (rawOrigin) return rawOrigin.replace(/\/+$/, '');
+  const proto = req.headers['x-forwarded-proto'] || 'https';
+  const host = req.headers['x-forwarded-host'] || req.headers.host || 'localhost';
+  return `${proto}://${host}`;
+}
 // Admin dashboard (issue): admins are matched by uid; INVITE_ONLY gates new signups behind a
 // code the admin generates. Both default off so a fresh self-hosted instance stays open.
 const ADMIN_UIDS = (process.env.ADMIN_UIDS || '').split(',').map(s => s.trim()).filter(Boolean);
@@ -358,7 +374,7 @@ function csrfOk(req, key) {
   // Browsers put an Origin on every state-changing request and a page cannot suppress it, so the
   // forgery this exists to stop always carries one.
   if (!origin) return true;
-  return originsMatch(origin, ORIGIN);
+  return originsMatch(origin, getOrigin(req));
 }
 
 /* ---------- challenge store (in-memory, 5 min TTL) ---------- */
@@ -545,8 +561,10 @@ const routes = {
       return json(res, 403, { error: 'a valid invite code is required' });
     }
     const uid = crypto.randomBytes(12).toString('base64url');
+    const rpID = getRpId(req);
+    const origin = getOrigin(req);
     const options = await generateRegistrationOptions({
-      rpName: RP_NAME, rpID: RP_ID,
+      rpName: RP_NAME, rpID,
       userID: Buffer.from(uid), userName: name, userDisplayName: name,
       attestationType: 'none',
       authenticatorSelection: { residentKey: 'required', userVerification: 'preferred' },
@@ -563,19 +581,21 @@ const routes = {
       audit(req, 'auth.register.fail', { ok: false, msg: 'challenge-expired' });
       return json(res, 400, { error: 'challenge expired — try again' });
     }
+    const rpID = getRpId(req);
+    const origin = getOrigin(req);
     let verification;
     try {
       verification = await verifyRegistrationResponse({
         response: body.credential,
         expectedChallenge: c.challenge,
-        expectedOrigin: ORIGIN,
-        expectedRPID: RP_ID,
+        expectedOrigin: origin,
+        expectedRPID: rpID,
         requireUserVerification: false
       });
     } catch (e) {
       // e.message can echo attacker-supplied response fields, so only the reason code is kept.
       audit(req, 'auth.register.fail', { ok: false, name: c.name, msg: 'verify-error' });
-      return json(res, 400, { error: verifyError(e, { rpId: RP_ID, origin: ORIGIN }) });
+      return json(res, 400, { error: verifyError(e, { rpId: rpID, origin: origin }) });
     }
     if (!verification.verified) {
       audit(req, 'auth.register.fail', { ok: false, name: c.name, msg: 'not-verified' });
@@ -610,8 +630,9 @@ const routes = {
   },
 
   'POST /api/login/options': async (req, res) => {
+    const rpID = getRpId(req);
     const options = await generateAuthenticationOptions({
-      rpID: RP_ID, userVerification: 'preferred', allowCredentials: []
+      rpID, userVerification: 'preferred', allowCredentials: []
     });
     const cid = putChallenge({ challenge: options.challenge });
     json(res, 200, { cid, options });
@@ -632,13 +653,15 @@ const routes = {
       audit(req, 'auth.login.fail', { ok: false, msg: 'unknown-credential' });
       return json(res, 404, { error: 'unknown passkey — create a profile first' });
     }
+    const rpID = getRpId(req);
+    const origin = getOrigin(req);
     let verification;
     try {
       verification = await verifyAuthenticationResponse({
         response: body.credential,
         expectedChallenge: c.challenge,
-        expectedOrigin: ORIGIN,
-        expectedRPID: RP_ID,
+        expectedOrigin: origin,
+        expectedRPID: rpID,
         requireUserVerification: false,
         credential: {
           id: cred.id,
@@ -649,7 +672,7 @@ const routes = {
       });
     } catch (e) {
       audit(req, 'auth.login.fail', { ok: false, user: db.users.find(u => u.id === cred.userId), uid: cred.userId, msg: 'verify-error' });
-      return json(res, 400, { error: verifyError(e, { rpId: RP_ID, origin: ORIGIN }) });
+      return json(res, 400, { error: verifyError(e, { rpId: rpID, origin: origin }) });
     }
     if (!verification.verified) {
       audit(req, 'auth.login.fail', { ok: false, user: db.users.find(u => u.id === cred.userId), uid: cred.userId, msg: 'not-verified' });
