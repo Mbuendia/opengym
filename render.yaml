@@ -29,6 +29,9 @@ services:
       - key: NGINX_PORT
         value: 80
       - key: BACKEND
-        value: opengym-api
+        fromService:
+          type: web
+          name: opengym-api
+          property: host
       - key: PORT
         value: 3000
