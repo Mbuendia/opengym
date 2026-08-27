@@ -31,6 +31,8 @@ LABEL maintainer="Duarte Santos https://gitlab.com/DuarteSantos8" \
     org.opencontainers.image.created=$BUILD_DATE
 
 COPY web/nginx.conf.template /etc/nginx/templates/default.conf.template
+COPY web/docker-entrypoint.d/ /docker-entrypoint.d/
+RUN chmod +x /docker-entrypoint.d/*.sh
 COPY --from=build /app/dist /usr/share/nginx/html
 # exercise media (img/gif) is mounted at runtime from the media volume
 

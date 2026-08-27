@@ -5,6 +5,8 @@ server {
     root /usr/share/nginx/html;
     index index.html;
 
+    resolver ${NAMESERVER} 1.1.1.1 8.8.8.8 valid=10s ipv6=off;
+
     # Sent on every response below. NOTE: an `add_header` inside a location replaces the whole
     # inherited set rather than adding to it, so the two locations further down that set their
     # own Cache-Control have to repeat these three. Deliberately not a full Content-Security-
@@ -20,7 +22,8 @@ server {
     # as /api/anything.json would be matched by the \.(js|css|json|html)$ block instead and be
     # looked for on disk rather than proxied.
     location ^~ /api/ {
-        proxy_pass http://${BACKEND}:${PORT};
+        set $backend_upstream "http://${BACKEND}:${PORT}";
+        proxy_pass $backend_upstream;
         proxy_http_version 1.1;
         proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;
