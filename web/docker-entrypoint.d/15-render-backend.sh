@@ -1,9 +1,5 @@
 #!/bin/sh
-# 1. Determine system DNS nameserver for Nginx dynamic resolver
-NS=$(awk '/nameserver/ {print $2; exit}' /etc/resolv.conf 2>/dev/null)
-export NAMESERVER="${NS:-1.1.1.1}"
-
-# 2. Fix Alpine musl single-label DNS resolution on Render
+# Fix Alpine musl single-label DNS resolution on Render
 if [ -n "$BACKEND" ] && [ "$BACKEND" != "localhost" ] && [ "$BACKEND" != "127.0.0.1" ]; then
   case "$BACKEND" in
     *.*) ;;
