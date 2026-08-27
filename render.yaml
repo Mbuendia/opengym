@@ -10,12 +10,9 @@ services:
       - key: PORT
         value: 3000
       - key: DATA_DIR
-        value: /data
+        value: ./data
       - key: RP_ID
-        fromService:
-          type: web
-          name: opengym-web
-          property: host
+        value: opengym-web.onrender.com
       - key: ORIGIN
         value: https://opengym-web.onrender.com
       - key: RP_NAME
@@ -34,12 +31,6 @@ services:
       - key: PORT
         value: 80
       - key: BACKEND
-        fromService:
-          type: web
-          name: opengym-api
-          property: host
+        value: opengym-api.onrender.internal
       - key: API_PORT
-        fromService:
-          type: web
-          name: opengym-api
-          property: port
+        value: 3000
