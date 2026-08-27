@@ -18,7 +18,7 @@ No account on someone else's server, no subscription, no ads. Just `docker compo
 ![React](https://img.shields.io/badge/React-19-38bdf8?style=flat-square&logo=react&logoColor=white)
 ![Docker](https://img.shields.io/badge/Docker-compose-2496ED?style=flat-square&logo=docker&logoColor=white)
 ![No tracking](https://img.shields.io/badge/telemetry-none-f472b6?style=flat-square)
-
+[![Deploy Jekyll with GitHub Pages dependencies preinstalled](https://github.com/Mbuendia/opengym/actions/workflows/jekyll-gh-pages.yml/badge.svg)](https://github.com/Mbuendia/opengym/actions/workflows/jekyll-gh-pages.yml)
 
 </div>
 
