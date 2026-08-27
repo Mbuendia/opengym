@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>openGym — Self-Hosted Fitness & Workout Tracker</title>
+  <meta name="description" content="openGym es una plataforma libre y auto-alojada para planificar rutinas, registrar entrenamientos, seguimiento de peso corporal y autenticación con Passkeys. Sin anuncios, 100% tu información.">
+  
+  <!-- Favicon & Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  
+  <style>
+    :root {
+      --bg-dark: #070A0F;
+      --bg-card: rgba(15, 23, 42, 0.7);
+      --bg-card-hover: rgba(30, 41, 59, 0.8);
+      --border-color: rgba(255, 255, 255, 0.08);
+      --accent-green: #00E676;
+      --accent-green-glow: rgba(0, 230, 118, 0.35);
+      --accent-cyan: #00B0FF;
+      --text-main: #F8FAFC;
+      --text-muted: #94A3B8;
+      --font-main: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg-dark);
+      color: var(--text-main);
+      font-family: var(--font-main);
+      line-height: 1.6;
+      overflow-x: hidden;
+      background-image: 
+        radial-gradient(circle at 15% 15%, rgba(0, 230, 118, 0.08) 0%, transparent 40%),
+        radial-gradient(circle at 85% 75%, rgba(0, 176, 255, 0.08) 0%, transparent 40%);
+      background-attachment: fixed;
+    }
+
+    /* Container */
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    /* Header Nav */
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      background: rgba(7, 10, 15, 0.8);
+      border-bottom: 1px solid var(--border-color);
+      padding: 18px 0;
+    }
+
+    .nav-wrapper {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-decoration: none;
+      color: var(--text-main);
+      font-weight: 800;
+      font-size: 1.4rem;
+      letter-spacing: -0.5px;
+    }
+
+    .brand-icon {
+      width: 38px;
+      height: 38px;
+      background: linear-gradient(135deg, var(--accent-green), var(--accent-cyan));
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      box-shadow: 0 0 20px var(--accent-green-glow);
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 28px;
+      list-style: none;
+    }
+
+    .nav-links a {
+      color: var(--text-muted);
+      text-decoration: none;
+      font-weight: 500;
+      font-size: 0.95rem;
+      transition: color 0.2s ease;
+    }
+
+    .nav-links a:hover {
+      color: var(--text-main);
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 24px;
+      border-radius: 12px;
+      font-weight: 700;
+      font-size: 0.95rem;
+      text-decoration: none;
+      transition: all 0.25s ease;
+      cursor: pointer;
+      border: 1px solid transparent;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--accent-green), #00C853);
+      color: #041B0F;
+      box-shadow: 0 4px 20px var(--accent-green-glow);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 30px rgba(0, 230, 118, 0.5);
+    }
+
+    .btn-secondary {
+      background: rgba(255, 255, 255, 0.05);
+      color: var(--text-main);
+      border-color: var(--border-color);
+    }
+
+    .btn-secondary:hover {
+      background: rgba(255, 255, 255, 0.1);
+      border-color: rgba(255, 255, 255, 0.2);
+    }
+
+    /* Hero Section */
+    .hero {
+      padding: 100px 0 60px;
+      text-align: center;
+      position: relative;
+    }
+
+    .badge-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 16px;
+      border-radius: 30px;
+      background: rgba(0, 230, 118, 0.1);
+      border: 1px solid rgba(0, 230, 118, 0.3);
+      color: var(--accent-green);
+      font-size: 0.85rem;
+      font-weight: 600;
+      margin-bottom: 24px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .hero h1 {
+      font-size: 3.8rem;
+      font-weight: 800;
+      line-height: 1.15;
+      letter-spacing: -1.5px;
+      margin-bottom: 24px;
+      background: linear-gradient(180deg, #FFFFFF 30%, #94A3B8 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .hero p {
+      font-size: 1.25rem;
+      color: var(--text-muted);
+      max-width: 720px;
+      margin: 0 auto 36px;
+      font-weight: 400;
+    }
+
+    .hero-actions {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      margin-bottom: 60px;
+    }
+
+    /* Interactive Demo Card */
+    .demo-window {
+      background: #0D131F;
+      border: 1px solid var(--border-color);
+      border-radius: 20px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6), 0 0 40px rgba(0, 230, 118, 0.1);
+      overflow: hidden;
+      margin-top: 40px;
+      text-align: left;
+    }
+
+    .window-header {
+      background: rgba(15, 23, 42, 0.9);
+      padding: 14px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .dots {
+      display: flex;
+      gap: 8px;
+    }
+
+    .dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+    }
+
+    .dot-red { background: #FF5F56; }
+    .dot-yellow { background: #FFBD2E; }
+    .dot-green { background: #27C93F; }
+
+    .window-title {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      font-family: var(--font-mono);
+    }
+
+    .window-body {
+      padding: 32px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 32px;
+    }
+
+    @media (max-width: 900px) {
+      .hero h1 { font-size: 2.6rem; }
+      .window-body { grid-template-columns: 1fr; }
+      .nav-links { display: none; }
+    }
+
+    /* Interactive Preview Widget */
+    .workout-preview-card {
+      background: rgba(15, 23, 42, 0.6);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 16px;
+      padding: 24px;
+    }
+
+    .card-header-flex {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .exercise-title {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--text-main);
+    }
+
+    .muscle-badge {
+      background: rgba(0, 176, 255, 0.15);
+      color: var(--accent-cyan);
+      font-size: 0.75rem;
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-weight: 600;
+    }
+
+    .set-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 14px;
+      background: rgba(255, 255, 255, 0.03);
+      border-radius: 10px;
+      margin-bottom: 10px;
+      font-size: 0.9rem;
+      font-family: var(--font-mono);
+    }
+
+    .set-row.active {
+      border: 1px solid var(--accent-green);
+      background: rgba(0, 230, 118, 0.08);
+    }
+
+    .check-box {
+      width: 22px;
+      height: 22px;
+      border-radius: 6px;
+      background: var(--accent-green);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #041B0F;
+      font-weight: 800;
+      font-size: 12px;
+    }
+
+    /* Feature Grid */
+    .features {
+      padding: 100px 0;
+    }
+
+    .section-title {
+      text-align: center;
+      margin-bottom: 60px;
+    }
+
+    .section-title h2 {
+      font-size: 2.5rem;
+      font-weight: 800;
+      letter-spacing: -1px;
+      margin-bottom: 16px;
+    }
+
+    .section-title p {
+      color: var(--text-muted);
+      font-size: 1.1rem;
+    }
+
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 28px;
+    }
+
+    .feature-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 20px;
+      padding: 32px;
+      transition: all 0.3s ease;
+      position: relative;
+    }
+
+    .feature-card:hover {
+      background: var(--bg-card-hover);
+      border-color: rgba(0, 230, 118, 0.3);
+      transform: translateY(-4px);
+    }
+
+    .feature-icon {
+      width: 52px;
+      height: 52px;
+      border-radius: 14px;
+      background: rgba(0, 230, 118, 0.1);
+      border: 1px solid rgba(0, 230, 118, 0.2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      margin-bottom: 20px;
+      color: var(--accent-green);
+    }
+
+    .feature-card h3 {
+      font-size: 1.3rem;
+      font-weight: 700;
+      margin-bottom: 12px;
+    }
+
+    .feature-card p {
+      color: var(--text-muted);
+      font-size: 0.95rem;
+      line-height: 1.6;
+    }
+
+    /* Self Hosting Guide Code block */
+    .self-hosting {
+      padding: 80px 0;
+      background: rgba(15, 23, 42, 0.4);
+      border-top: 1px solid var(--border-color);
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .code-box {
+      background: #04070D;
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      padding: 24px;
+      font-family: var(--font-mono);
+      font-size: 0.9rem;
+      color: #E2E8F0;
+      overflow-x: auto;
+      position: relative;
+    }
+
+    .code-comment { color: #64748B; }
+    .code-cmd { color: var(--accent-green); }
+
+    /* Footer */
+    footer {
+      padding: 60px 0 40px;
+      border-top: 1px solid var(--border-color);
+      text-align: center;
+      color: var(--text-muted);
+      font-size: 0.9rem;
+    }
+
+    footer a {
+      color: var(--text-main);
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    footer a:hover {
+      color: var(--accent-green);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Header Navigation -->
+  <header>
+    <div class="container nav-wrapper">
+      <a href="#" class="brand">
+        <div class="brand-icon">🏋️</div>
+        <span>openGym</span>
+      </a>
+      <ul class="nav-links">
+        <li><a href="#features">Características</a></li>
+        <li><a href="#demo">Vista Previa</a></li>
+        <li><a href="#hosting">Auto-Alojamiento</a></li>
+        <li><a href="https://github.com/Mbuendia/opengym" target="_blank">GitHub</a></li>
+      </ul>
+      <a href="https://opengym-wk82.onrender.com" target="_blank" class="btn btn-primary">
+        <span>Probar App en Vivo</span>
+        <span>→</span>
+      </a>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <section class="hero">
+    <div class="container">
+      <div class="badge-pill">✨ 100% Libre, Auto-alojable & Privado</div>
+      <h1>Tu Gimnasio. Tus Entrenamientos.<br>Tus Datos. Tu Servidor.</h1>
+      <p>
+        openGym es la plataforma autogestionada para planificar rutinas, registrar series y cargas, controlar peso corporal y analizar tu progreso muscular. Autenticación con Passkeys biológicas y sin seguimiento de terceros.
+      </p>
+
+      <div class="hero-actions">
+        <a href="https://opengym-wk82.onrender.com" target="_blank" class="btn btn-primary">
+          <span>🚀 Desplegado en Render</span>
+        </a>
+        <a href="https://github.com/Mbuendia/opengym" target="_blank" class="btn btn-secondary">
+          <span>📦 Repositorio GitHub</span>
+        </a>
+      </div>
+
+      <!-- Demo Window -->
+      <div class="demo-window" id="demo">
+        <div class="window-header">
+          <div class="dots">
+            <div class="dot dot-red"></div>
+            <div class="dot dot-yellow"></div>
+            <div class="dot dot-green"></div>
+          </div>
+          <div class="window-title">openGym Dashboard — https://opengym-wk82.onrender.com</div>
+        </div>
+        <div class="window-body">
+          <!-- Left: Active Workout Preview -->
+          <div class="workout-preview-card">
+            <div class="card-header-flex">
+              <div>
+                <div class="exercise-title">Bench Press (Barbell)</div>
+                <div style="font-size:0.8rem; color:var(--text-muted); margin-top:2px;">Serie 3 de 4 · Descanso 90s</div>
+              </div>
+              <span class="muscle-badge">Pecho & Tríceps</span>
+            </div>
+
+            <div class="set-row">
+              <span>Serie 1</span>
+              <span>80 kg × 10 reps</span>
+              <div class="check-box">✓</div>
+            </div>
+            <div class="set-row">
+              <span>Serie 2</span>
+              <span>85 kg × 8 reps</span>
+              <div class="check-box">✓</div>
+            </div>
+            <div class="set-row active">
+              <span>Serie 3 (Actual)</span>
+              <span>90 kg × 6 reps</span>
+              <span style="color:var(--accent-green); font-weight:700;">En proceso...</span>
+            </div>
+            <div class="set-row" style="opacity:0.5;">
+              <span>Serie 4</span>
+              <span>90 kg × 6 reps</span>
+              <span>○</span>
+            </div>
+          </div>
+
+          <!-- Right: Interactive Highlights -->
+          <div style="display:flex; flex-direction:column; justify-content:center; gap:20px;">
+            <h3 style="font-size:1.6rem; font-weight:800; line-height:1.3;">Diseñado para un rendimiento impecable en cualquier dispositivo</h3>
+            <p style="color:var(--text-muted); font-size:0.95rem;">
+              Instálalo como PWA en iOS o Android, usa el modo mantenido de pantalla (*Wake Lock*) durante tu sesión y accede a tus estadísticas históricas en milisegundos.
+            </p>
+            <div style="display:flex; gap:12px;">
+              <span style="background:rgba(255,255,255,0.05); padding:8px 14px; border-radius:8px; font-size:0.85rem; font-family:var(--font-mono);">🔒 WebAuthn Passkeys</span>
+              <span style="background:rgba(255,255,255,0.05); padding:8px 14px; border-radius:8px; font-size:0.85rem; font-family:var(--font-mono);">⚡ Docker Ready</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- Features Grid Section -->
+  <section class="features" id="features">
+    <div class="container">
+      <div class="section-title">
+        <h2>Todo lo que necesitas para tu entrenamiento</h2>
+        <p>Potente, ligero y totalmente bajo tu control.</p>
+      </div>
+
+      <div class="grid-3">
+        <!-- Feature 1 -->
+        <div class="feature-card">
+          <div class="feature-icon">🔒</div>
+          <h3>Passkeys (WebAuthn)</h3>
+          <p>Olvídate de las contraseñas tradicionales. Inicia sesión al instante con la huella dactilar, Face ID o PIN de tu dispositivo de forma criptográfica.</p>
+        </div>
+
+        <!-- Feature 2 -->
+        <div class="feature-card">
+          <div class="feature-icon">🏋️‍♂️</div>
+          <h3>Series, Repes & Superseries</h3>
+          <p>Soporte completo para ejercicios de fuerza, peso corporal, cardio y superseries combinadas con temporizador de descanso automatizado.</p>
+        </div>
+
+        <!-- Feature 3 -->
+        <div class="feature-card">
+          <div class="feature-icon">📊</div>
+          <h3>Estimación 1RM & Progreso</h3>
+          <p>Calcula automáticamente tu repetición máxima (1RM), analiza gráficos de volumen de carga e historial de peso corporal por fechas.</p>
+        </div>
+
+        <!-- Feature 4 -->
+        <div class="feature-card">
+          <div class="feature-icon">🛡️</div>
+          <h3>Soberanía de Datos</h3>
+          <p>Tus datos se guardan en archivos JSON ligeros. Exporta o haz copias de seguridad de todo tu historial con 1 solo clic cuando quieras.</p>
+        </div>
+
+        <!-- Feature 5 -->
+        <div class="feature-card">
+          <div class="feature-icon">📱</div>
+          <h3>PWA Instalable & Offline</h3>
+          <p>Agrégalo a la pantalla de inicio de tu teléfono. Funciona sin conexión y mantiene la pantalla encendida mientras entrenas.</p>
+        </div>
+
+        <!-- Feature 6 -->
+        <div class="feature-card">
+          <div class="feature-icon">🌍</div>
+          <h3>Multidioma Nativo</h3>
+          <p>Traducido completamente al Español, Inglés, Francés, Alemán, Ruso, Chino, Portugués y más idiomas.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Self Hosting Section -->
+  <section class="self-hosting" id="hosting">
+    <div class="container">
+      <div class="section-title">
+        <h2>Despliega tu propio servidor en segundos</h2>
+        <p>Ejecuta tu instancia privada en Docker o Render.</p>
+      </div>
+
+      <div class="code-box">
+        <span class="code-comment"># 1. Clona el repositorio oficial</span><br>
+        <span class="code-cmd">git clone https://github.com/Mbuendia/opengym.git</span><br>
+        <span class="code-cmd">cd opengym</span><br><br>
+        <span class="code-comment"># 2. Despliega con Docker Compose en tu servidor local</span><br>
+        <span class="code-cmd">docker compose up -d</span><br><br>
+        <span class="code-comment"># ¡Listo! Abre http://localhost:8080 en tu navegador</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    <div class="container">
+      <p>
+        <strong>openGym</strong> — Proyecto Open Source mantenido por <a href="https://github.com/Mbuendia" target="_blank">Mbuendia</a>.<br>
+        Publicado bajo Licencia AGPL-3.0 · <a href="https://github.com/Mbuendia/opengym" target="_blank">Ver Repositorio en GitHub</a>
+      </p>
+    </div>
+  </footer>
+
+</body>
+</html>
