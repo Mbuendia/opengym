@@ -1,0 +1,38 @@
+services:
+  # 1. API Service (Node.js backend)
+  - type: web
+    name: opengym-api
+    env: docker
+    dockerfilePath: ./api/Dockerfile
+    dockerContext: ./api
+    plan: free
+    envVars:
+      - key: PORT
+        value: 3000
+      - key: DATA_DIR
+        value: /var/data
+      - key: RP_ID
+        sync: false
+      - key: ORIGIN
+        sync: false
+      - key: RP_NAME
+        value: openGym
+    disk:
+      name: opengym-data
+      mountPath: /var/data
+      sizeGB: 1
+
+  # 2. Web Service (Nginx + React Frontend)
+  - type: web
+    name: opengym-web
+    env: docker
+    dockerfilePath: ./web/Dockerfile
+    dockerContext: .
+    plan: free
+    envVars:
+      - key: NGINX_PORT
+        value: 80
+      - key: BACKEND
+        value: opengym-api
+      - key: PORT
+        value: 3000
