@@ -12,9 +12,12 @@ services:
       - key: DATA_DIR
         value: /data
       - key: RP_ID
-        sync: false
+        fromService:
+          type: web
+          name: opengym-web
+          property: host
       - key: ORIGIN
-        sync: false
+        value: https://opengym-web.onrender.com
       - key: RP_NAME
         value: openGym
 
@@ -36,4 +39,7 @@ services:
           name: opengym-api
           property: host
       - key: API_PORT
-        value: 3000
+        fromService:
+          type: web
+          name: opengym-api
+          property: port
