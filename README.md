@@ -18,13 +18,7 @@ No account on someone else's server, no subscription, no ads. Just `docker compo
 ![React](https://img.shields.io/badge/React-19-38bdf8?style=flat-square&logo=react&logoColor=white)
 ![Docker](https://img.shields.io/badge/Docker-compose-2496ED?style=flat-square&logo=docker&logoColor=white)
 ![No tracking](https://img.shields.io/badge/telemetry-none-f472b6?style=flat-square)
-<br>
-[![Pipeline](https://gitlab.com/DuarteSantos8/opengym/badges/main/pipeline.svg?style=flat-square)](https://gitlab.com/DuarteSantos8/opengym/-/pipelines)
-![Last commit](https://img.shields.io/gitlab/last-commit/DuarteSantos8%2Fopengym?style=flat-square)
-[![Stars](https://img.shields.io/gitlab/stars/DuarteSantos8%2Fopengym?style=flat-square)](https://gitlab.com/DuarteSantos8/opengym/-/starrers)
-[![Issues](https://img.shields.io/gitlab/issues/open/DuarteSantos8%2Fopengym?style=flat-square)](https://gitlab.com/DuarteSantos8/opengym/-/issues)
-[![Discord](https://img.shields.io/badge/Discord-join-5865F2?style=flat-square&logo=discord&logoColor=white)](https://discord.gg/e62jY6fwVb)
-[![Buy Me A Coffee](https://img.shields.io/badge/Buy%20me%20a%20coffee-support-FFDD00?style=flat-square&logo=buymeacoffee&logoColor=black)](https://buymeacoffee.com/duartesantos)
+
 
 </div>
 
@@ -42,10 +36,9 @@ No account on someone else's server, no subscription, no ads. Just `docker compo
 
 <div align="center">
 
-### [🌐 opengym.duarte-santos.ch](https://opengym.duarte-santos.ch) · [📦 Source on GitLab](https://gitlab.com/DuarteSantos8/opengym)
 
 Screenshots, docs and the APK download live on the site.<br>
-<sub>Want to poke at it first? The <a href="https://opengym.duarte-santos.ch/demo/">in-browser
+<sub>Want to poke at it first? The in-browser
 demo</a> is the real app with example data — no account, nothing to install.</sub>
 
 </div>
@@ -88,7 +81,7 @@ as a home-screen app, passkey sign-in, offline support, sync across your phone a
 - 📥 **Bring your history with you** — import from **FitNotes** (Android and iOS), **Strong** and **Hevy**, or body weight straight out of an **Apple Health** export. Exercise names are matched against the library and anything unrecognised becomes one of your own exercises, so nothing in the file is dropped
 - 📦 **Yours to keep** — one-tap JSON export/import, guest mode, **no telemetry**
 - 🤖 **Ask an AI about your training** (optional) — an [MCP server](mcp/README.md) lets a client like Claude Desktop or Cursor read your history in your own words: *"what did I bench last week?"*. Read-only, spawned locally by the client, nothing leaves your box. Not in the Docker build — if you don't use an AI assistant, it isn't there
-- 📱 **Standalone Android app** — the whole tracker as a sideloadable APK: no account, no server, data on the phone, native workout reminders ([download](https://opengym.duarte-santos.ch))
+- 📱 **Standalone Android app** — the whole tracker as a sideloadable APK: no account, no server, data on the phone, native workout reminders 
 
 ## Quick start (self-host)
 
@@ -126,8 +119,8 @@ no backend — everything stays on the phone, with native workout-day reminders 
 backups. Self-hosting gets you multi-device sync and profiles for friends & family; the
 mobile app is the install-and-done flavor.
 
-- **Android:** [**download the APK**](https://opengym.duarte-santos.ch) — or straight from
-  [GitLab's package registry](https://gitlab.com/DuarteSantos8/opengym/-/packages), where every
+- **Android:** [**download the APK**] — or straight from
+  [GitLab's package registry], where every
   build sits next to its `.sha256` — and sideload it; openGym is deliberately not on the Play
   Store. Or build it yourself: **[docs/MOBILE.md](docs/MOBILE.md)**.
 - **iPhone:** Apple doesn't allow installing apps outside the App Store, so there is no iOS
@@ -192,7 +185,7 @@ host side of that volume, not the variable.
 
 Rough, community-driven — ideas and PRs welcome:
 
-- [x] Standalone mobile app — Android APK to sideload ([download](https://opengym.duarte-santos.ch)); on iOS as a self-hosted PWA (no store listings planned)
+- [x] Standalone mobile app — Android APK to sideload ([download]); on iOS as a self-hosted PWA (no store listings planned)
 - [x] Automatic progression programs (linear, Greyskull LP, double progression) with stalls and deloads
 - [x] Estimated 1RM per exercise
 - [ ] Percentage / training-max programming (5/3/1-style) on top of the progression engine
@@ -230,7 +223,7 @@ in the Docker build.
   an issue over the Discord for anything the next person should be able to find by searching.
 - **Login trouble?** Most of it is an `RP_ID`/`ORIGIN` mismatch — check
   [docs/SELF_HOSTING.md](docs/SELF_HOSTING.md) before opening an issue.
-- **Merge requests** — [open one on GitLab](https://gitlab.com/DuarteSantos8/opengym/-/merge_requests); see
+- **Merge requests** — [open one on GitLab]; see
   [CONTRIBUTING.md](CONTRIBUTING.md).
 
 > **On the GitHub repo:** `github.com/DuarteSantos8/openGym` is offline because the account was
@@ -249,14 +242,7 @@ openGym is free and stays free: AGPL, no subscription, no paid tier, nothing hel
 sponsors. If it replaced a paid tracker for you and you want to chip in, there's a coffee button
 below (and a badge at the top) — a star, a bug report or a merge request is worth just as much.
 
-<!-- GitLab has no Sponsor button the way GitHub's FUNDING.yml gave one, so the link has to
-     stand on its own here. .github/FUNDING.yml stays put for the day that account returns. -->
 
-<a href="https://buymeacoffee.com/duartesantos" target="_blank">
-  <img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png"
-       alt="Buy Me A Coffee"
-       style="height: 60px !important;width: 217px !important;">
-</a>
 
 ## License
 
