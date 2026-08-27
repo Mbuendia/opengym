@@ -943,6 +943,48 @@ const routes = {
   }
 };
 
+const MIME_TYPES = {
+  '.html': 'text/html; charset=utf-8',
+  '.js': 'application/javascript; charset=utf-8',
+  '.css': 'text/css; charset=utf-8',
+  '.json': 'application/json; charset=utf-8',
+  '.png': 'image/png',
+  '.jpg': 'image/jpeg',
+  '.jpeg': 'image/jpeg',
+  '.gif': 'image/gif',
+  '.svg': 'image/svg+xml',
+  '.ico': 'image/x-icon',
+  '.woff': 'font/woff',
+  '.woff2': 'font/woff2',
+  '.webp': 'image/webp',
+  '.avif': 'image/avif'
+};
+
+const STATIC_DIR = process.env.STATIC_DIR ? path.resolve(process.env.STATIC_DIR) : null;
+
+function serveStatic(req, res, pathname) {
+  if (!STATIC_DIR || !fs.existsSync(STATIC_DIR)) return false;
+  let target = path.join(STATIC_DIR, path.normalize(pathname).replace(/^(\.\.[\/\\])+/, ''));
+  if (fs.existsSync(target) && fs.statSync(target).isDirectory()) {
+    target = path.join(target, 'index.html');
+  }
+  if (!fs.existsSync(target) || fs.statSync(target).isDirectory()) {
+    target = path.join(STATIC_DIR, 'index.html');
+  }
+  if (!fs.existsSync(target)) return false;
+  const ext = path.extname(target).toLowerCase();
+  const contentType = MIME_TYPES[ext] || 'application/octet-stream';
+  res.writeHead(200, {
+    'Content-Type': contentType,
+    'Cache-Control': ext === '.html' ? 'no-cache, must-revalidate' : 'public, max-age=2592000, immutable',
+    'X-Frame-Options': 'DENY',
+    'X-Content-Type-Options': 'nosniff'
+  });
+  if (req.method === 'HEAD') { res.end(); return true; }
+  fs.createReadStream(target).pipe(res);
+  return true;
+}
+
 http.createServer(async (req, res) => {
   // Same-origin (the deployed nginx-proxied web app) never triggers CORS, so this only matters
   // for the paired mobile app calling in from its own WebView origin. It carries no cookie
@@ -961,17 +1003,20 @@ http.createServer(async (req, res) => {
   const url = new URL(req.url, 'http://x');
   const key = req.method + ' ' + url.pathname;
   const handler = routes[key];
-  if (!handler) return json(res, 404, { error: 'not found' });
-  if (!csrfOk(req, key)) {
-    // Logged, not audited: this is reachable without a session, and an audit entry per attempt
-    // would let anyone fill the log. An operator who has genuinely mis-set ORIGIN needs to see
-    // the mismatch, and the container log is where they will look.
-    console.warn('refused cross-origin', key, 'origin=' + req.headers.origin, 'expected=' + ORIGIN);
-    return json(res, 403, { error: 'cross-origin request refused' });
+  if (handler) {
+    if (!csrfOk(req, key)) {
+      console.warn('refused cross-origin', key, 'origin=' + req.headers.origin, 'expected=' + ORIGIN);
+      return json(res, 403, { error: 'cross-origin request refused' });
+    }
+    try { await handler(req, res); }
+    catch (e) {
+      console.error(key, e);
+      if (!res.headersSent) json(res, 500, { error: 'server error' });
+    }
+    return;
   }
-  try { await handler(req, res); }
-  catch (e) {
-    console.error(key, e);
-    if (!res.headersSent) json(res, 500, { error: 'server error' });
+  if (req.method === 'GET' || req.method === 'HEAD') {
+    if (serveStatic(req, res, url.pathname)) return;
   }
+  return json(res, 404, { error: 'not found' });
 }).listen(PORT, () => console.log(`gym-api on :${PORT} (rpID=${RP_ID}, origin=${ORIGIN})`));
