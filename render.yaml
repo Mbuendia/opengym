@@ -28,10 +28,12 @@ services:
     envVars:
       - key: NGINX_PORT
         value: 80
+      - key: PORT
+        value: 80
       - key: BACKEND
         fromService:
           type: web
           name: opengym-api
           property: host
-      - key: PORT
+      - key: API_PORT
         value: 3000

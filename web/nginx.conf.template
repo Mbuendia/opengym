@@ -22,7 +22,7 @@ server {
     # as /api/anything.json would be matched by the \.(js|css|json|html)$ block instead and be
     # looked for on disk rather than proxied.
     location ^~ /api/ {
-        set $backend_target "http://${BACKEND}:${PORT}";
+        set $backend_target "http://${BACKEND}:${API_PORT}";
         proxy_pass $backend_target;
         proxy_http_version 1.1;
         proxy_set_header Host $host;
