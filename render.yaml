@@ -10,17 +10,13 @@ services:
       - key: PORT
         value: 3000
       - key: DATA_DIR
-        value: /var/data
+        value: /data
       - key: RP_ID
         sync: false
       - key: ORIGIN
         sync: false
       - key: RP_NAME
         value: openGym
-    disk:
-      name: opengym-data
-      mountPath: /var/data
-      sizeGB: 1
 
   # 2. Web Service (Nginx + React Frontend)
   - type: web
