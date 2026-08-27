@@ -1,12 +1,9 @@
 #!/bin/sh
-# Fix Alpine musl single-label DNS resolution on Render:
-# If BACKEND has no dot (e.g. opengym-api-1fj7), update the template so Nginx uses .onrender.internal
-if [ -n "$BACKEND" ] && [ "$BACKEND" != "localhost" ] && [ "$BACKEND" != "127.0.0.1" ]; then
-  case "$BACKEND" in
-    *.*) ;;
-    *)
-      echo "Alpine DNS: Appending .onrender.internal to BACKEND '$BACKEND' in nginx template..."
-      sed -i "s|\${BACKEND}|\${BACKEND}.onrender.internal|g" /etc/nginx/templates/default.conf.template
-      ;;
-  esac
+# Extract actual IP of nameserver from /etc/resolv.conf (e.g. 10.217.0.1 or 127.0.0.11)
+DNS_IP=$(awk '/nameserver/ {print $2; exit}' /etc/resolv.conf 2>/dev/null)
+if [ -z "$DNS_IP" ]; then
+  DNS_IP="1.1.1.1"
 fi
+
+echo "Setting Nginx resolver IP to: $DNS_IP 1.1.1.1"
+sed -i "s|\${RESOLVER_IP}|$DNS_IP 1.1.1.1|g" /etc/nginx/templates/default.conf.template
